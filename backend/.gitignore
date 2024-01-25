@@ -1,0 +1,4 @@
+node_modules
+comands
+.env
+client/src/component/textApi.jsx

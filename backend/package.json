@@ -1,0 +1,27 @@
+{
+  "name": "voice-assistant",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "annyang": "^2.6.1",
+    "compromise": "^14.10.0",
+    "cors": "^2.8.5",
+    "country-state-city": "^3.2.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "framer-motion": "^10.16.4",
+    "mongoose": "^7.6.2",
+    "node-nlp": "^4.27.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
