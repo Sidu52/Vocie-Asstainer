@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const { findfunction } = require('../controller/home');
+const { findfunction, sendSMS } = require('../controller/home');
 
 router.post('/findfunction', findfunction);
-// app.use("/todo", require('./router/index'));
+router.post('/sendSms', sendSMS);
 
 module.exports = router;

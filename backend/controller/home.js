@@ -1,4 +1,5 @@
 const os = require('os');
+const twilio = require("twilio")
 const { exec } = require('child_process');
 const StringModel = require('../model/stringSchema');
 const uniqueStr = require('../model/uniqeString');
@@ -66,6 +67,7 @@ const manager = new NlpManager({ languages: ['en'], forceNER: true });
 // manager.addAnswer('en', 'rollDie', 'rollDie');
 // manager.addAnswer('en', 'solarSytem', 'solarSytem');
 // manager.addAnswer('en', 'LoveCalculator', 'LoveCalculator');
+// manager.addAnswer('en', 'sendSms', 'sendSms');
 
 (async () => {
     await manager.load();
@@ -75,7 +77,6 @@ const manager = new NlpManager({ languages: ['en'], forceNER: true });
 
 async function findfunction(req, res) {
     try {
-        console.log("Ener", req.body.userInput)
         const userInput = req.body.userInput;
         const doc = compromise(userInput);
         // Extract the intent (action)  
@@ -101,6 +102,31 @@ async function findfunction(req, res) {
         res.status(500).json({ message: 'An error occurred while processing the request.', error });
     }
 }
+
+
+const accountSid = 'ACf47e7e8eed3933983cb669fc58644e3f';
+const authToken = '817026df29d3d591e3fd1f01ad5988be';
+const client = require('twilio')(accountSid, authToken);
+
+// SendMessage
+async function sendSMS(to, message) {
+    try {
+        // Send SMS
+        const result = await client.messages.create({
+            body: 'hy this side sidhu alston',
+            from: '+17083152514',
+            to: '+918085984844'
+        })
+
+        console.log(result.sid);
+        return res.status(200).json({ message: 'message send successful' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'message not send successful', error: error });
+    }
+}
+
+
 async function executeCommand(intent, entity) {
     if (intent === 'open' && entity) {
         const softwareCommands = {
@@ -128,7 +154,6 @@ async function executeCommand(intent, entity) {
         return softwareCommand;
     }
 }
-
 async function openSoftware(command) {
     const platform = os.platform(); // Get the user's operating system platform
     switch (platform) {
@@ -196,4 +221,4 @@ async function saveUniqueString(inputString) {
     }
 }
 
-module.exports = { findfunction }
+module.exports = { findfunction, sendSMS }

@@ -1,0 +1,71 @@
+html,
+body {
+  font-family: "Avenir Next", "Lato", sans-serif;
+}
+* {
+  transition: all 0.2s linear;
+}
+ .m-cue .a-cue-icon {
+  position: absolute;
+  width: 163px;
+  height: 163px;
+  transform: translateX(5px) translateY(5px);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ff4fc0 0%, #ff4e83 100%);
+  box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.5);
+}
+ .m-cue .a-cue-voice {
+  transform-origin: center center;
+}
+ .m-cue .a-cue-voice-el {
+  background:linear-gradient(180deg, #fa1b8b 0%, #ff4ea1 100%);
+}
+ .m-cue .a-cue-voice-el:nth-child(1) {
+  animation: hovering 6s linear 0.2s infinite reverse both;
+}
+ .m-cue .a-cue-voice-el:nth-child(2) {
+  animation: hovering 4s linear 0.2s infinite both;
+}
+ .m-cue .a-cue-voice-el:nth-child(3) {
+  animation: hovering 3s linear 0.2s infinite reverse both;
+}
+ .m-cue .a-cue-voice-el:nth-child(4) {
+  animation: hovering 5s linear 0.2s infinite both;
+}
+ .m-cue .a-cue-voice-el:nth-child(5) {
+  animation: hovering 8s linear 0.2s infinite reverse both;
+}
+ .m-cue .speaking {
+  animation: pulse 2.5s linear 0s infinite;
+}
+@keyframes hovering {
+  from {
+    transform: rotate(0deg) translateX(18px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(18px) rotate(-260deg);
+  }
+}
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.1);
+  }
+  30% {
+    transform: scale(1.2);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  60% {
+    transform: scale(1.2);
+  }
+  80% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
