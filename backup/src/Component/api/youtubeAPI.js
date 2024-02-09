@@ -32,7 +32,8 @@ async function youtube(search) {
     const response = await fetchYouTubeData(apiKey, searchQuery, 'video')
     if (response.items && response.items.length > 0) {
         // Play the first video from the search results
-        const videoId = response.items[0].id.videoId;
+        // const videoId = response.items[0].id.videoId;
+        const videoId = response.items;
         return videoId;
         // playYouTubeContent(videoId);
     } else {

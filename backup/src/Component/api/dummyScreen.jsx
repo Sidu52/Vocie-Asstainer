@@ -7,11 +7,11 @@ import Coin__toss_Sound from '../../assets/sound/Coin__toss__sound.mp3'
 import Dice__Rolling_Sound from '../../assets/sound/Dice__Roll.mp3'
 import { jokesData, Name, Hello, Bye, AboutYou, love_jarvis, hate_jarvis, SidhuAlston, Disturb, FamilyInfo, jarvise_work } from '../../data/jokeData'
 
-export default function DummyScreen({ name }) {
+export default function DummyScreen({ name, userInput }) {
     const { setListen, setSpeaking, setMicListen } = useContext(MyContext);
     const hasMounted = useRef(false);
     const VITE_API_KEY = process.env.REACT_APP_COUNTRY_API_KEY;
-
+    const regex = /\d+(\.\d+)?/g;
     useEffect(() => {
         if (!hasMounted.current) {
             // Only run the effect on the initial mount
@@ -84,6 +84,8 @@ export default function DummyScreen({ name }) {
                 return getLovePercentage()
             case "sendSms":
             // return sendSMS();
+            case "remain":
+                return Remain(userInput)
             default:
                 // Handle the case where an invalid name is provided.
                 data = ["Invalid name provided."];
@@ -438,6 +440,53 @@ export default function DummyScreen({ name }) {
     //         console.error(error);
     //     }
     // }
+
+    async function Remain(input) {
+        try {
+            console.log("1");
+
+            const RemainValue = localStorage.getItem("remain");
+            const regex = /\d+/; // Add the regex for extracting numbers
+
+            if (!RemainValue &&
+                input?.toLowerCase()?.includes("remain") &&
+                input?.toLowerCase()?.includes("number") &&
+                !input?.toLowerCase()?.includes(["word", "sentence", "paragraph"])
+            ) {
+                console.log("2");
+                const Number = input.match(regex);
+                if (Number) {
+                    localStorage.setItem("remain", Number[0]);
+                    setSpeaking(true);
+                    await speakText(`Okay, number ${Number[0]} remain`);
+                    setSpeaking(false);
+                    return setListen(true);
+                }
+            } else if (
+                !RemainValue &&
+                input?.toLowerCase()?.includes("remain") &&
+                input?.toLowerCase()?.includes(["word", "sentence", "paragraph"])
+            ) {
+                console.log("3");
+                const str = input.split("remain");
+                console.log("STR", str);
+            } else {
+                console.log("4", input);
+                setSpeaking(true);
+                await speakText(`I remain at ${RemainValue}`);
+                setSpeaking(false);
+                return setListen(true);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            setSpeaking(true);
+            await speakText("Oops! Something went wrong. Please try again.");
+            setSpeaking(false);
+            localStorage.removeItem("remain");
+            return setListen(true);
+        }
+    }
+
 
     async function getLovePercentage() {
         try {

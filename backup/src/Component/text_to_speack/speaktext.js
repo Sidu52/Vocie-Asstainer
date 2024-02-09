@@ -21,8 +21,6 @@ const speakText = async (message, lang = 'en') => {
             const synthesis = window.speechSynthesis;
             const chunkSize = 100; // Adjust the chunk size based on your needs
             const chunks = message.match(new RegExp(`.{1,${chunkSize}}`, 'g'));
-
-            console.log(chunks)
             const speakChunk = (index) => {
                 if (index < chunks.length) {
                     const utterance = new SpeechSynthesisUtterance(chunks[index]);

@@ -68,6 +68,7 @@ const manager = new NlpManager({ languages: ['en'], forceNER: true });
 // manager.addAnswer('en', 'solarSytem', 'solarSytem');
 // manager.addAnswer('en', 'LoveCalculator', 'LoveCalculator');
 // manager.addAnswer('en', 'sendSms', 'sendSms');
+// manager.addAnswer('en', 'remain', 'remain');
 
 (async () => {
     await manager.load();

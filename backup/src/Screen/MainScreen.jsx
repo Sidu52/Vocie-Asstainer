@@ -13,21 +13,20 @@ import { IoCloseCircleOutline } from 'react-icons/io5'
 import alarmImage from '../assets/Images/alarmB.gif'
 import { CiMicrophoneOn } from "react-icons/ci";
 import './MainUI.css'
-// import Music from '../Component/api/Music';
+import Music from '../Component/api/Music';
 
 const MainScreen = () => {
     const localuser = JSON.parse(localStorage.getItem('user'));
+    const [textInput, setTextInput] = useState("")
     const [alarmRing, setAlarmRing] = useState(false);
     const [alardetail, setAlarmDeatil] = useState({});
     const [abortController, setAbortController] = useState(new AbortController());
     const { showScreen, setShowScreen, listen, setListen, load, userInput, setUserInput, speaking, setSpeaking, micListen, setMicListen } = useContext(MyContext);
-    const [listening, setListening] = useState(false);
     const [search, setSearch] = useState(false);
 
     const [tourToggle, setTourToggle] = useState(true);
 
     useEffect(() => {
-
         const userInput = "Hello what is your name";
         axios.post(`${URL}/findfunction`, { userInput })
             .then(response => {
@@ -41,6 +40,7 @@ const MainScreen = () => {
 
     useEffect(() => {
         if (listen) {
+            abortController.abort();
             setShowScreen(null)
             takeinputcall("");
         }
@@ -90,6 +90,7 @@ const MainScreen = () => {
     };
 
     const takeinputcall = async (value) => {
+        // setOperationStatus('canceled');
         let input = value || "";
         if (input == "") {
             // setListening(true)
@@ -128,7 +129,8 @@ const MainScreen = () => {
             setSpeaking(true);
             await speakText("Hy what should i do for you");
             setSpeaking(false);
-            setListen(true)
+            setShowScreen(null)
+            takeinputcall("");
         }
     }
 
@@ -163,13 +165,12 @@ const MainScreen = () => {
                 {alarmRing ? <audio src="https://2u039f-a.akamaihd.net/downloads/ringtones/files/mp3/technocraj-20230730-0001-61126.mp3" autoPlay loop></audio> : null}
 
             </div>
-            <div className="flex flex-col items-center justify-center" style={{ width: "30%" }}>
+            <div className="w-4/12 flex flex-col max-md:w-4/5 items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" style={{ zIndex: 2 }}>
 
                 {
                     tourToggle ? <PopupTour handleClosetour={handleClosetour} /> : null
                 }
                 <div className=''>
-                    {/* {listening ? <p>Listening...</p> : <p>Not listening</p>} */}
                     <p>{userInput}</p>
                 </div>
                 <div className="m-cue min-w-52 min-h-52 relative flex items-center justify-center">
@@ -190,8 +191,16 @@ const MainScreen = () => {
                     </div>
 
                 </div>
-                <div className='relative w-full  flex items-center gap-2'>
-                    <input className=' px-3 py-2 w-5/6 outline-none border border-black-700 rounded-xl' type="text" placeholder='Enter text here' />
+                <div className='relative w-full flex items-center gap-2'>
+                    <form
+                        className='w-5/6'
+                        onSubmit={(e) => {
+                            e.preventDefault()
+                            setListen(true)
+                            takeinputcall(textInput)
+                        }}>
+                        <input className=' px-3 py-2 w-full outline-none border border-black-700 rounded-xl' value={textInput} onChange={(e) => setTextInput(e.target.value)} type="text" placeholder='Enter text here' />
+                    </form>
                     <span className='p-1'>
                         <CiMicrophoneOn className={`microphone text-xl cursor-pointer ${micListen ? "active-mic" : ""}`}
                             onClick={() => {
@@ -208,15 +217,18 @@ const MainScreen = () => {
                     </span>
                 </div>
             </div>
-            {showScreen ?
-                <div className='w-full flex flex-col items-center justify-center'>
-                    <span className=' cursor-pointer' onClick={handleClick}>Close</span>
-                    <div className='flex items-center justify-center overflow-hidden'>
-                        {showScreen}
+            {
+                showScreen ?
+                    <div className='w-full flex flex-col items-center justify-center'>
+                        <span className=' cursor-pointer' onClick={handleClick}>Close</span>
+                        <div className='flex items-center justify-center overflow-hidden'>
+                            {showScreen}
+                            {/* <Music userInput={"play new Bollywood song on youtube"} /> */}
+                        </div>
                     </div>
-                </div>
-                : ""}
-        </div>
+                    : ""
+            }
+        </div >
 
     );
 }

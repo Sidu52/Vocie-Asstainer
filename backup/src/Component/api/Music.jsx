@@ -9,10 +9,15 @@ import audiogif from '../../assets/Images/sirilike.gif'
 import { Resizable } from 'react-resizable';
 import Draggable from 'react-draggable';
 import 'react-resizable/css/styles.css';
+import YouTube from 'react-youtube';
+import { MdOutlinePlayCircle } from "react-icons/md";
 
 export default function Music({ userInput }) {
+
     const audioRef = useRef(null);
+    const playerRef = useRef(null);
     const [videoShow, setVideoShow] = useState(true)
+    const [videoPlay, setVideoPlay] = useState(true)
     const { setListen, setSpeaking, setShowScreen, setMicListen } = useContext(MyContext);
     const hasMounted = useRef(false);
     const [volume, setVolume] = useState(100);
@@ -20,10 +25,21 @@ export default function Music({ userInput }) {
     const [musicURL, setMusicURL] = useState("");
     const [musicArray, setMusicArray] = useState([]);
     const [musicIndex, setMusicIndex] = useState(0);
+    const [videoIndex, setVideoIndex] = useState(0);
+    let videoArray = [];
     let musicArr = [];
     let musicInd = 0;
+    let videoInd = 0;
     const [dragable, setDragable] = useState(false)
     const [size, setSize] = useState({ width: 300, height: 300 });
+
+    const opts = {
+        height: '390',
+        width: '640',
+        playerVars: {
+            autoplay: 1,
+        },
+    };
 
     const handleResize = (e, { size: newSize, handle }) => {
         setSize((prevSize) => ({
@@ -142,6 +158,13 @@ export default function Music({ userInput }) {
             console.log(percentage)
             handleVolumeChange(percentage);
         }
+        else if (Input?.toLowerCase()?.includes("play")) {
+            userInput = Input
+            const musicData = await playMusic(userInput || "Bollywood");
+            setMusicArray(musicData);
+            musicArr = musicData
+            setMusicIndex(0);
+        }
         await musicController()
     }
     //Handle music voice
@@ -151,21 +174,138 @@ export default function Music({ userInput }) {
         audioRef.current.volume = cVolume / 100;
     };
 
+    // Controll YouTunbe Video
+    const YoutubeMusicController = async () => {
+
+        const stopcommand = [
+            "stop jarvis",
+            "stop Jarvis",
+            "jarvis stop",
+            'music stop',
+            'video stop',
+            'close window',
+            'stop'
+        ];
+        const nextVideo = [
+            "next music",
+            "next video",
+            "next song",
+            "song next",
+            "video next",
+            "music next",
+            "change music",
+            "change video",
+            'forward music',
+            'forward video',
+            'music forward',
+            'new music',
+        ]
+        const prevVideo = [
+            "previous music",
+            "previous video",
+            "previous song",
+            "song previous",
+            "video previous",
+            "old video",
+            'video previous',
+        ]
+        const playVideo = [
+            "pause video",
+            "video pause",
+            "music pause",
+            "song pause"
+        ]
+        const puseVideo = [
+            "play video",
+            'video play',
+            "song play",
+            "music play",
+        ]
+        const VolumeControll = [
+            "sound",
+            'Voice increse',
+            'Volume',
+        ]
+        setMicListen(true)
+        const Input = await takeInput();
+        setMicListen(false)
+        const play = playVideo.some(cmd => Input?.toLowerCase()?.includes(cmd.toLowerCase()));
+        const pause = puseVideo.some(cmd => Input?.toLowerCase()?.includes(cmd.toLowerCase()))
+        const prevSong = prevVideo.some(cmd => Input?.toLowerCase()?.includes(cmd.toLowerCase()))
+        const nextSong = nextVideo.some(cmd => Input?.toLowerCase()?.includes(cmd.toLowerCase()))
+        const volume = VolumeControll.some(cmd => Input?.toLowerCase()?.includes(cmd.toLowerCase()))
+        const stop = stopcommand.some(cmd => Input?.toLowerCase()?.includes(cmd.toLowerCase()))
+        if (stop) {
+            return setListen(true);
+        }
+        else if (play) {
+            const player = playerRef.current;
+            player.pauseVideo();
+        } else if (pause) {
+            const player = playerRef.current;
+
+            player.playVideo();
+        }
+        else if (prevSong) {
+            if (videoInd == 0) {
+                setVideoURL(videoArray[videoArray.length - 1].id.videoId)
+                videoInd = musicArr - 1
+            } else {
+                setVideoURL(videoArray[videoInd - 1].id?.videoId)
+                videoInd = videoInd - 1
+            }
+        } else if (nextSong) {
+            if (videoInd == musicArray.length - 1) {
+                setVideoURL(videoArray[0].id?.videoId)
+                videoInd = 0;
+            } else {
+                setVideoURL(videoArray[videoInd + 1].id?.videoId)
+                videoInd = videoInd + 1
+            }
+        }
+        else if (volume) {
+            const regex = /\d+(\.\d+)?/g;
+            const percentage = Input.match(regex);
+            handleVideoVolumeChange(percentage, Input);
+        }
+        else if (Input?.toLowerCase()?.includes("play")) {
+            userInput = Input
+            const videoData = await youtube(userInput);
+            videoArray = videoData;
+            setVideoURL(videoData[videoInd].id?.videoId)
+        }
+        await YoutubeMusicController()
+    }
+
+    const handleVideoVolumeChange = (newVolume, Input) => {
+
+        const player = playerRef.current;
+        if (newVolume) {
+            const videoVolume = Math.max(0, Math.min(100, newVolume));
+            player.setVolume(videoVolume);
+        } else if (Input?.toLowerCase()?.includes("decrease")) {
+            const currentVolume = player.getVolume();
+            const newVolume = Math.max(currentVolume - 10, 0);
+            player.setVolume(newVolume);
+        } else {
+            const currentVolume = player.getVolume();
+            const newVolume = Math.min(currentVolume + 10, 100);
+            player.setVolume(newVolume);
+        }
+    };
     async function handleYouTube() {
         try {
             const arr = ['play', 'music', 'song', 'run', 'i', 'want', 'youtube', 'video', 'audio'];
             const sanitizedInput = userInput.split(' ').filter(word => !arr.includes(word)).join(' ');
-            // Check if the modified userInput contains "video" and "YouTube"
             let containsVideo = userInput.toLowerCase().includes('video');
             let containsYouTube = userInput.toLowerCase().includes('youtube');
             if (containsYouTube || containsVideo) {
                 const videoData = await youtube(userInput);
-                setVideoURL(`https://www.youtube.com/embed/${videoData}?autoplay=1`);
+                videoArray = videoData;
+                setVideoURL(videoData[videoInd].id?.videoId)
+
                 if (window.screen.width > 450) {
-                    await MusicStop();
-                    // if (output) {
-                    //     return setListen(true);
-                    // }
+                    await YoutubeMusicController();
                 } else {
                     return
                 }
@@ -175,8 +315,8 @@ export default function Music({ userInput }) {
                 setVideoShow(false)
                 setSpeaking(true);
                 await speakText('Okay music searching');
-                const musicData = await playMusic(sanitizedInput || "Bollywood");
                 setSpeaking(false);
+                const musicData = await playMusic(sanitizedInput || "Bollywood");
                 setMusicArray(musicData);
                 musicArr = musicData
                 setMusicIndex(0);
@@ -199,7 +339,7 @@ export default function Music({ userInput }) {
     }
     async function playNextSong(musicData) {
         try {
-            if (musicIndex < musicData.length) {
+            if (musicIndex < musicData?.length) {
                 const music = musicData[musicIndex];
                 const musicurl = music.downloadUrl;
                 if (musicurl.length > 0) {
@@ -217,17 +357,44 @@ export default function Music({ userInput }) {
         }
     }
 
-    function handleMusicStop() {
-        console.log("Find Problem")
-        setShowScreen(false)
-        return setListen(true);
-    }
+    const onReady = (event) => {
+        playerRef.current = event.target;
+    };
+    // const handlePlayPause = () => {
+    //     console.log("Enter")
+    //     const player = playerRef.current;
+    //     if (player.getPlayerState() === window.YT.PlayerState.PLAYING) {
+    //         player.pauseVideo();
+    //         setVideoPlay(false)
+    //     } else {
+    //         player.playVideo();
+    //         setVideoPlay(true)
+    //     }
+    // };
+    // const handleVolumeUp = () => {
+    //     const player = playerRef.current;
+    //     const currentVolume = player.getVolume();
+    //     const newVolume = Math.min(currentVolume + 10, 100);
+    //     player.setVolume(newVolume);
+    // };
+    // const handleVolumeDown = () => {
+    //     const player = playerRef.current;
+    //     const currentVolume = player.getVolume();
+    //     const newVolume = Math.max(currentVolume - 10, 0);
+    //     player.setVolume(newVolume);
+    // };
+
+
+    // function handleMusicStop() {
+    //     setShowScreen(false)
+    //     return setListen(true);
+    // }
 
     return (
         <div className="absolute bottom-0 right-0 overflow-hidden w-full h-full">
-            {
+            {/* {
                 window.screen.width < 450 ? <div className="bg-black text-white" onClick={handleMusicStop}>Stop</div> : null
-            }
+            } */}
 
             <Draggable
                 disabled={dragable}
@@ -242,9 +409,9 @@ export default function Music({ userInput }) {
                     maxConstraints={[800, 500]}
                     resizeHandles={['s', 'w', 'e', 'n', 'se', 'sw', 'ne', 'nw']}
                 >
-                    <div className="flex justify-center items-center w-full h-96 absolute bottom-0 right-0" style={{ width: size.width, height: size.height }}>
-                        <div className=" absolute w-full bg-opacity-0"
-                            style={{ height: "70%" }}
+                    <div className="flex justify-center items-center w-full h-96 absolute bottom-0 right-0 " style={{ width: size.width, height: size.height, zIndex: "3" }}>
+                        <div className=" absolute top-1 rounded-2xl bg-opacity-0 z-10"
+                            style={{ width: "95%", height: "80%" }}
                             onMouseOver={() => {
                                 setDragable(false)
                             }}
@@ -253,15 +420,11 @@ export default function Music({ userInput }) {
                             }}
                         ></div>
                         {videoShow ? (
-                            <div className="w-full h-full" >
-                                <iframe
-                                    src={videoURL}
-                                    title="YouTube video player"
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                    allowFullScreen
-                                    className="w-full h-full"
-                                ></iframe>
+                            <div className="w-full h-full relative" >
+                                <div className="videoContainer">
+                                    <YouTube key={videoURL} autoPlay videoId={videoURL} opts={opts} onReady={onReady} />
+
+                                </div>
                             </div>
                         ) : (
                             <div className="flex flex-col items-center w-full h-full overflow-hidden">

@@ -4,10 +4,10 @@ export default function PopupTour({ handleClosetour }) {
     const [tourWindow, setTourWindow] = useState([true, false, false])
 
     return (
-        <div className='w-full h-screen flex items-center justify-center absolute top-0 left-0'>
+        <div className='w-full h-full flex items-center justify-center absolute top-0 left-0'>
             {tourWindow[0] ?
-                <div className='bg-white w-1/2 h-1/2 z-10 flex items-center justify-center flex-col gap-5 border border-black-200 rounded-3xl px-2'>
-                    <span>This is a Ai Voice Assistant Powered By <strong>Siddhant Sharma</strong></span>
+                <div className='bg-white w-full h-full z-10 flex items-center justify-center flex-col gap-5 border border-black-200 rounded-3xl px-2 absolute top-0 left-0'>
+                    <span className='max-sm:text-sm'>This is a Ai Voice Assistant Powered By <strong>Siddhant Sharma</strong></span>
                     <div className='flex flex-col items-center justify-center gap-2'>
                         <div className='flex items-center justify-center gap-2'>
                             <button onClick={() => setTourWindow(prevState => [
@@ -22,13 +22,13 @@ export default function PopupTour({ handleClosetour }) {
                 </div> :
                 //Secound Windnow
                 tourWindow[1] ?
-                    <div className='bg-white w-1/2 h-4/2 z-10 flex items-center justify-center flex-col gap-5  border border-black-200 rounded-3xl px-2'>
+                    <div className='bg-white w-full h-full z-10 flex items-center justify-center flex-col gap-5  border border-black-200 rounded-3xl px-2 absolute top-0 left-0'>
                         <ul className='leading-6 list-disc'>
-                            <span className='text-xl font-semibold'>Features:</span>
+                            <span className='text-xl font-semibold max-sm:text-sm'>Features:</span>
                             <li>Retrieve Country, State, and City Information</li>
                             <li>Get City Weather Updates</li>
                             <li>Play Games: General Knowledge Quiz and Number Guessing</li>
-                            <li>Listen to Music: Video or Audio, and Control Audio Playback</li>
+                            <li>Listen to Music: Video or Audio, and Control with voice command</li>
                             <li>Retrieve Date, Time, Weekday, Month, Year</li>
                             <li>Try Your Luck: Toss a Coin or Roll a Dice</li>
                             <li>Translate Sentences to Any Language</li>
@@ -60,8 +60,8 @@ export default function PopupTour({ handleClosetour }) {
                     </div> :
                     //Third Windnow
                     tourWindow[2] ?
-                        <div className='bg-white w-1/2 h-1/2 z-10 flex items-center justify-center flex-col gap-5  border border-black-200 rounded-3xl px-2'>
-                            <span>For Using Giving a Starting Command <strong>Hyy Jarvis</strong> OR <strong>Hello Jarvis</strong> after Complete Tour <span>and Ask that you have in Your mind</span></span>
+                        <div className='bg-white w-full h-full z-10 flex items-center justify-center flex-col gap-5  border border-black-200 rounded-3xl px-2 absolute top-0 left-0'>
+                            <span className='max-sm:text-sm'>For Using Giving a Starting Command <strong>Hyy Jarvis</strong> OR <strong>Hello Jarvis</strong> after Complete Tour <span>and Ask that you have in Your mind</span></span>
 
                             <div className='flex flex-col items-center justify-center gap-2'>
                                 <div className='flex items-center justify-center gap-2'>

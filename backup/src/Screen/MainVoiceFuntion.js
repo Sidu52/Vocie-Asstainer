@@ -115,7 +115,9 @@ const find = async (userInput) => {
             //Love Paercentage
             case "LoveCalculator":
             case "sendSms":
-                return <DummyScreen name={data.data} />
+            //Remain 
+            case "remain":
+                return <DummyScreen name={data.data} userInput={userInput} />
             case "solarSytem":
                 return <SolarSystem userInput={userInput} />
             case "story":
