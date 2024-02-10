@@ -146,8 +146,20 @@ const FamilyInfo = [
 ];
 
 const jarvise_work = [
-    "I am a voice assistant i have knowlege about country state city and famous personlity and also i play audio and video music for you according your taste and i tell about weather and population data and also i capble to perform todo list for you"
+    "I am a voice assistant i have knowlege about country state city and famous personlity and also i am playing audio and video music for you according your taste and i tell about weather and population data and also i capble to perform todo list for you",
+    "I am a voice assistant with the ability to answer general knowledge questions.",
+    "You can ask me about historical events, science facts, and technology trends.",
+    "I can provide information about sports, entertainment, and current news updates.",
+    "If you need a joke or a fun fact, feel free to ask, and I'll do my best to lighten the mood.",
+    "I can assist you in setting reminders, alarms, and timers to help you stay organized.",
+    "Ask me for the latest weather forecast in your area, and I'll keep you informed.",
+    "I can suggest recipes and cooking tips if you're looking for culinary inspiration.",
+    "Tell me your favorite genre, and I'll recommend books, movies, or TV shows for your entertainment.",
+    "I can help you learn new languages with basic phrases and pronunciation guidance.",
+    "Let me know if you want to hear a motivational quote to boost your day.",
+    "If you're feeling stressed, I can guide you through short meditation or relaxation exercises."
 ];
+
 
 
 const getdata = async (name) => {

@@ -117,6 +117,9 @@ const find = async (userInput) => {
             case "sendSms":
             //Remain 
             case "remain":
+            case "open_website":
+            //Get Location
+            case "get_Location":
                 return <DummyScreen name={data.data} userInput={userInput} />
             case "solarSytem":
                 return <SolarSystem userInput={userInput} />

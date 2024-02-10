@@ -7,10 +7,12 @@ import Coin__toss_Sound from '../../assets/sound/Coin__toss__sound.mp3'
 import Dice__Rolling_Sound from '../../assets/sound/Dice__Roll.mp3'
 import { jokesData, Name, Hello, Bye, AboutYou, love_jarvis, hate_jarvis, SidhuAlston, Disturb, FamilyInfo, jarvise_work } from '../../data/jokeData'
 
+
+
 export default function DummyScreen({ name, userInput }) {
     const { setListen, setSpeaking, setMicListen } = useContext(MyContext);
     const hasMounted = useRef(false);
-    const VITE_API_KEY = process.env.REACT_APP_COUNTRY_API_KEY;
+    const VITE_Location_API_KEY = process.env.REACT_APP_Location_API_KEY;
     const regex = /\d+(\.\d+)?/g;
     useEffect(() => {
         if (!hasMounted.current) {
@@ -86,10 +88,19 @@ export default function DummyScreen({ name, userInput }) {
             // return sendSMS();
             case "remain":
                 return Remain(userInput)
+            case "open_website":
+                return openWeb()
+            case "get_Location":
+                const Location = await getUserLocation();
+                console.log("object", Location)
+                await speakText(`Your Location is ${Location?.locationName.split("-")[0]}`)
+                return setListen(true)
             default:
                 // Handle the case where an invalid name is provided.
                 data = ["Invalid name provided."];
         }
+
+
 
         // Return a random item from the selected data array.
         const randomIndex = Math.floor(Math.random() * data.length);
@@ -302,6 +313,62 @@ export default function DummyScreen({ name, userInput }) {
             return setListen(true);
         }
     };
+
+    async function openWeb() {
+        await speakText("okay")
+        return setListen(true);
+    }
+
+
+
+    //Get Locaton
+    async function getUserLocation() {
+        return new Promise(async (resolve, reject) => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const userLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                        };
+
+                        try {
+                            const locationName = await getLocationName(userLocation.latitude, userLocation.longitude);
+                            userLocation.locationName = locationName;
+                            resolve(userLocation);
+                        } catch (error) {
+                            reject(`Error getting location name: ${error.message}`);
+                        }
+                    },
+                    (error) => {
+                        reject(`Error getting user location: ${error.message}`);
+                    }
+                );
+            } else {
+                reject('Geolocation is not supported by this browser.');
+            }
+        });
+    }
+
+    async function getLocationName(latitude, longitude) {
+        try {
+            const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json?key=${""}&q=${latitude}+${longitude}&pretty=1`);
+
+            const results = response.data.results;
+
+            if (results.length > 0) {
+                const locationName = results[0].formatted;
+                return locationName;
+            } else {
+                setSpeaking(true)
+                await speakText('Location not found.');
+                setSpeaking(false)
+                return setListen(true)
+            }
+        } catch (error) {
+            return setListen(true)
+        }
+    }
 
     //Translater
     const transl = async (sentence, from, to) => {

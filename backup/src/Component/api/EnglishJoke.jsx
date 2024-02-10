@@ -68,16 +68,15 @@ export default function EnglishJoke({ name }) {
                     .replace(/[\u{1F600}-\u{1F64F}]/gu, ''); // Additional range for Rome Open Mouth emoji
                 setSpeaking(true);
                 await speakText(str, "HI");
-
-
                 await speakText("क्या आप और चुटकुले सुनना चाओगे |", "HI");
                 setSpeaking(false);
                 setMicListen(true)
-                const input = takeInput();
+                const input = await takeInput();
                 setMicListen(false)
-                if (input && input.toLowerCase().includes("joke") && input.toLowerCase().includes("yes") && input.toLowerCase().includes("another")) {
+                if (input && input.toLowerCase().includes("joke") || input.toLowerCase().includes("yes") || input.toLowerCase().includes("another") || input.toLowerCase().includes("han")) {
                     return handleHindiJoke();
                 }
+                await speakText("Sorry input not found try again later")
                 return setListen(true)
 
             }

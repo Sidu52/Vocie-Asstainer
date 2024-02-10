@@ -69,6 +69,7 @@ const manager = new NlpManager({ languages: ['en'], forceNER: true });
 // manager.addAnswer('en', 'LoveCalculator', 'LoveCalculator');
 // manager.addAnswer('en', 'sendSms', 'sendSms');
 // manager.addAnswer('en', 'remain', 'remain');
+// manager.addAnswer('en', 'get_Location', 'get_Location');
 
 (async () => {
     await manager.load();
@@ -94,7 +95,7 @@ async function findfunction(req, res) {
             saveStringToDatabase(userInput, data.answer);
         }
         if (data.answer === "open_website") {
-            await openSoftware(webname);
+            await openSoftware(userInput);
         }
         return res.status(200).json({ message: 'find data sucessfull', data: data.answer || "Not_Category", noun: entity });
         // return res.status(200).json({ message: 'find data sucessfull', data });
@@ -155,28 +156,77 @@ async function executeCommand(intent, entity) {
         return softwareCommand;
     }
 }
+
+
 async function openSoftware(command) {
-    const platform = os.platform(); // Get the user's operating system platform
+    const platform = os.platform();
+    let softwareCommand = ""; // Corrected: Removed const since it's being reassigned
+
     switch (platform) {
         case 'win32':
         case 'win64':
-            const softwareCommand = `start ${command}.exe`;
-            // const softwareCommand = `start "" "C:\\Program Files\\${command}\\${command}.exe"`;
+            if (command?.toLowerCase()?.includes("notepad")) {
+                softwareCommand = `start notepad.exe`;
+            } else if (command?.toLowerCase()?.includes("camera")) {
+                softwareCommand = `start camera.exe`;
+            } else if (command?.toLowerCase()?.includes("chrome")) {
+                softwareCommand = `start chrome.exe`;
+            } else if (command?.toLowerCase()?.includes("skype")) {
+                softwareCommand = `start skype.exe`;
+            } else if (command?.toLowerCase()?.includes("brave")) {
+                softwareCommand = `start brave.exe`;
+            } else if (command?.toLowerCase()?.includes("file explorer")) {
+                softwareCommand = `start explorer.exe`;
+            } else if (command?.toLowerCase()?.includes("vscode") || command?.toLowerCase()?.includes("visual studio code")) {
+                softwareCommand = `code`;
+            } else if (command?.toLowerCase()?.includes("email")) {
+                softwareCommand = `start outlook.exe`;
+            } else if (command?.toLowerCase()?.includes("copilot")) {
+                softwareCommand = `start copilot.exe`; // Update with the actual command for Copilot
+            } else if (command?.toLowerCase()?.includes("calculator")) {
+                softwareCommand = `start calc.exe`;
+            } else if (command?.toLowerCase()?.includes("word") || command?.toLowerCase()?.includes("ms word")) {
+                softwareCommand = `start winword.exe`;
+            } else if (command?.toLowerCase()?.includes("excel")) {
+                softwareCommand = `start excel.exe`;
+            } else if (command?.toLowerCase()?.includes("powerpoint")) {
+                softwareCommand = `start powerpnt.exe`;
+            } else if (command?.toLowerCase()?.includes("settings")) {
+                softwareCommand = `start ms-settings:`;
+            } else if (command?.toLowerCase()?.includes("spotify")) {
+                softwareCommand = `start spotify.exe`;
+            } else if (command?.toLowerCase()?.includes("clock")) {
+                softwareCommand = `start ms-clock:`;
+            } else if (command?.toLowerCase()?.includes("media player")) {
+                softwareCommand = `start wmplayer.exe`;
+            } else if (command?.toLowerCase()?.includes("photo")) {
+                softwareCommand = `start microsoft.windows.photos:`;
+            } else if (command?.toLowerCase()?.includes("paint")) {
+                softwareCommand = `start mspaint.exe`;
+            } else if (command?.toLowerCase()?.includes("sound recorder")) {
+                softwareCommand = `start sndrec32.exe`;
+            } else {
+                console.error(`Unsupported software: ${command}`);
+                return;
+            }
+
             exec(softwareCommand, (error) => {
                 if (error) {
                     console.error(`Error: ${error}`);
                 }
             });
             break;
+
         case 'linux':
         case 'darwin':
-            const shellCommand = command;
+            const shellCommand = command; // Corrected: Removed unnecessary line
             exec(shellCommand, (error) => {
                 if (error) {
                     console.error(`Error: ${error}`);
                 }
             });
             break;
+
         case 'android':
             const adbCommand = `adb shell ${command}`;
             exec(adbCommand, (error) => {
@@ -185,11 +235,68 @@ async function openSoftware(command) {
                 }
             });
             break;
+
         default:
             console.error('Unsupported operating system:', platform);
             break;
     }
 }
+
+// Example usage:
+// openSoftware('notepad');
+// openSoftware('chrome');
+// openSoftware('file explorer');
+
+// async function openSoftware(command) {
+//     const platform = os.platform();
+//     const softwareCommand = ""
+//     switch (platform) {
+
+//         case 'win32':
+//         case 'win64':
+//             if (command?.toLowerCase()?.includes("notepad")) {
+//                 softwareCommand = `start notepad.exe`;
+//             } else if (command?.toLowerCase()?.includes("camera")) {
+//                 softwareCommand = `start camera.exe`;
+//             } else if (command?.toLowerCase()?.includes("chrome")) {
+//                 softwareCommand = `start chrome.exe`;
+//             } else if (command?.toLowerCase()?.includes("skype")) {
+//                 softwareCommand = `start skype.exe`;
+//             } else if (command?.toLowerCase()?.includes("brave")) {
+//                 softwareCommand = `start brave.exe`;
+//             } else if (command?.toLowerCase()?.includes("fiel exploser")) {
+//                 softwareCommand = `start fileexploser.exe`;
+//             }
+//             const softwareCommand =
+//                 // const softwareCommand = `start "" "C:\\Program Files\\${command}\\${command}.exe"`;
+//                 exec(softwareCommand, (error) => {
+//                     if (error) {
+//                         console.error(`Error: ${error}`);
+//                     }
+//                 });
+//             break;
+//         case 'linux':
+//         case 'darwin':
+//             const shellCommand = command;
+//             exec(shellCommand, (error) => {
+//                 if (error) {
+//                     console.error(`Error: ${error}`);
+//                 }
+//             });
+//             break;
+//         case 'android':
+//             const adbCommand = `adb shell ${command}`;
+//             exec(adbCommand, (error) => {
+//                 if (error) {
+//                     console.error(`Error: ${error}`);
+//                 }
+//             });
+//             break;
+//         default:
+//             console.error('Unsupported operating system:', platform);
+//             break;
+//     }
+// }
 
 async function saveStringToDatabase(inputString, category) {
     try {

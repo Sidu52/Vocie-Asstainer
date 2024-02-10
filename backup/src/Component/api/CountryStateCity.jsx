@@ -1,14 +1,13 @@
 import React, { useRef, useEffect, useContext } from "react";
 import axios from "axios";
-import Geocode from "react-geocode";
 import compromise from 'compromise';
 import { MyContext } from "../../Context/Mycontext";
 import { Country, State, City } from 'country-state-city';
 import { speakText } from '../text_to_speack/speaktext';
-import { cityWeather } from './weatherAPi'
-
-// const VITE_COUNTRY_API_KEY = "Ym1SdzZJbENkZnA5SlR1ZEVrWlBkb2hqdE1VWHNwcTNVaHpKV0E0UA=="
+const { format } = require('date-fns');
+const VITE_WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
 const VITE_COUNTRY_API_KEY = process.env.REACT_APP_COUNTRY_API_KEY;
+
 
 export default function CountryStateCity({ category, userInput }) {
     const { setListen, speaking, setSpeaking } = useContext(MyContext);
@@ -56,6 +55,9 @@ export default function CountryStateCity({ category, userInput }) {
                             if (type === "country_capital") {
                                 return tellCapital(country.name)
                             } else {
+                                if (!country.name) {
+                                    return tellPopulation("india")
+                                }
                                 return tellPopulation(country.name)
                             }
                         } else {
@@ -98,39 +100,65 @@ export default function CountryStateCity({ category, userInput }) {
     }
 
 
-    async function getLocation() {
-        if (navigator.geolocation) {
-            return new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        resolve(position);
-                    },
-                    (error) => {
-                        reject(`Geolocation error: ${error.message}`);
-                    }
-                );
-            });
-        } else {
-            await speakText("Geolocation is not supported by this browser.");
-        }
-    }
 
-    async function getAddressName(latitude, longitude) {
+
+    const cityWeather = async (cityName, type) => {
         try {
-            // Assuming Geocode is properly imported
-            const response = await Geocode.fromLatLng(`${latitude},${longitude}`, {
-                key: "AIzaSyC9lT69Cbj7BhsuXBd35ZPVzUfZrDHQ4t4",
-                language: "en",
-                region: "us",
-            });
+            if (type == "City_Weather" && !userInput?.toLowerCase()?.includes("forecast")) {
+                const { data } = await axios.get(`https://api.openweathermap.org/data/2.5/weather?units=metric&q=${cityName}&appid=${VITE_WEATHER_API_KEY}`);
+                if (data) {
+                    setSpeaking(true)
+                    await speakText(`Now ${cityName} tempreature is ${data.main.temp} degree celcious and a number of cloud in sky is ${data.clouds.all} with${data.weather[0].description} and the wind speed is ${data.wind.speed}kilometer prati hours.`)
+                    setSpeaking(false)
+                } else {
+                    setSpeaking(true)
+                    speakText(`Sorry ${data.name} State is not found`);
+                    setSpeaking(false)
+                }
 
-            console.log("Data", response);
-            return response.results[0].formatted_address;
-        } catch (error) {
-            console.error(error);
-            throw new Error("Error fetching address name");
+            }
+            else {
+                const currentDate = new Date();
+                const formattedCurrentDate = format(currentDate, 'yyyy-MM-dd');
+
+                // Make the API request to get all forecast data for the current city
+                const { data } = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&units=metric&appid=${VITE_WEATHER_API_KEY}`);
+                const currentDayData = data.list.filter(item => {
+                    const itemDate = new Date(item.dt_txt);
+                    const formattedItemDate = format(itemDate, 'yyyy-MM-dd');
+                    return formattedItemDate === formattedCurrentDate;
+                });
+                if (currentDayData.length > 0) {
+                    for (const item of currentDayData) {
+                        setSpeaking(true);
+                        await speakText(`${formattedCurrentDate} ${cityName} temperature is ${item.main.temp} degrees Celsius, with ${item.clouds.all}% cloud coverage, ${item.weather[0].description}, and a wind speed of ${item.wind.speed} kilometers per hour.`);
+                        setSpeaking(false);
+                    }
+                } else {
+                    console.error('No data available for the current date.');
+                }
+
+                await speakText("What should I do for you next?");
+            }
+
+            // else {
+            //     const currentDate = new Date();
+            //     const formattedCurrentDate = format(currentDate, 'yyyy-MM-dd');
+            //     const { data } = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&units=metric&start_dt=${formattedCurrentDate}&end_dt=${formattedCurrentDate}&appid=${VITE_WEATHER_API_KEY}`);
+            //     console.log("DAta", data)
+            //     for (const item of data.list) {
+            //         setSpeaking(true)
+            //         await speakText(`${item.dt_txt} ${cityName} tempreature is ${item.main.temp} degree celcious and a number of cloud in sky is ${item.clouds.all} with${item.weather[0].description} and the wind speed is ${item.wind.speed}kilometer prati hours.`)
+            //         setSpeaking(false)
+            //     }
+            //     await speakText("What should i do for you next ")
+            // }
+            return setListen(true);
+        } catch (err) {
+            console.error(err);
+            return await speakText("Somting Wrong with me try again");
         }
-    }
+    };
 
     async function searchWiki(input) {
         try {
@@ -167,12 +195,12 @@ export default function CountryStateCity({ category, userInput }) {
                 setSpeaking(true);
                 await speakText(result);
                 setSpeaking(false);
-                return
+                return setListen(true);
             } else {
                 setSpeaking(true);
                 await speakText(`Sorry, no relevant information found for "${input}"`);
                 setSpeaking(false);
-                return
+                return setListen(true);
             }
 
         } catch (error) {
@@ -180,7 +208,7 @@ export default function CountryStateCity({ category, userInput }) {
             setSpeaking(true);
             await speakText("An error occurred during the search.");
             setSpeaking(false);
-            return
+            return setListen(true);
         }
     }
 
@@ -271,17 +299,23 @@ export default function CountryStateCity({ category, userInput }) {
     const tellCapital = async (country) => {
         try {
             const { data } = await axios.get(`https://restcountries.com/v3.1/name/${country}`);
-            if (data) {
-                setSpeaking(true);
-                await speakText(`The Capital of ${country} is a ${data[0].capital}`);
-                setSpeaking(false);
-                return setListen(true)
+            if (data.length > 0) {
+                const countryData = data.find(item => item.name.common.toLowerCase() === country.toLowerCase());
+                if (countryData) {
+                    setSpeaking(true);
+                    await speakText(`The Capital of ${country} is a ${countryData.capital}`);
+                    setSpeaking(true);
+                } else {
+                    setSpeaking(true);
+                    await speakText(`Country not found: ${country}`);
+                    setSpeaking(true);
+                }
             } else {
                 setSpeaking(true);
                 await speakText(`Sorry ${country} country is not found`);
                 setSpeaking(false);
-                return setListen(true)
             }
+            return setListen(true)
         } catch (err) {
             console.error(err);
             setSpeaking(true);
@@ -294,17 +328,24 @@ export default function CountryStateCity({ category, userInput }) {
     const tellPopulation = async (country) => {
         try {
             const { data } = await axios.get(`https://restcountries.com/v3.1/name/${country}`);
-            if (data) {
-                setSpeaking(true);
-                await speakText(`The population of ${country} is a ${data[0].population} population`);
-                setSpeaking(false);
-                return setListen(true)
+
+            if (data.length > 0) {
+                const countryData = data.find(item => item.name.common.toLowerCase() === country.toLowerCase());
+                if (countryData) {
+                    setSpeaking(true);
+                    await speakText(`The population of ${country} is a ${countryData.population} population`);
+                    setSpeaking(true);
+                } else {
+                    setSpeaking(true);
+                    await speakText(`Country not found: ${country}`);
+                    setSpeaking(true);
+                }
             } else {
                 setSpeaking(true);
                 await speakText(`Sorry ${country} country is not found`);
                 setSpeaking(false);
-                return setListen(true)
             }
+            return setListen(true)
         } catch (err) {
             console.error(err);
             setSpeaking(true);
