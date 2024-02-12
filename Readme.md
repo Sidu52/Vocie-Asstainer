@@ -37,7 +37,7 @@
   </div>
 
   <div class="usage">
-    <p>For Using, give a Starting Command <strong>"Hey Jarvis"</strong> OR <strong>"Hello Jarvis"</strong> after completing the tour and ask whatever you have in your mind.</p>
+    <p>For Using, give a Starting Voice Command <br> <strong>"Hey Jarvis"</strong> <br> <strong>"Hello Jarvis"</strong> <br>after completing the tour and ask whatever you have in your mind.</p>
   </div>
 
   <div class="how-to-run">
