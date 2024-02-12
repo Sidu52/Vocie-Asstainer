@@ -1,4 +1,4 @@
-const voiceName = 'Google हिन्दी';
+const voiceName = 'HI-IN';
 
 const getVoices = () => {
     return new Promise((resolve) => {
@@ -60,5 +60,3 @@ const speakText = async (message, lang = 'en') => {
 
 
 export { speakText };
-
-

@@ -3,9 +3,13 @@ import { MyContext } from "../../Context/Mycontext";
 import { speakText } from "../text_to_speack/speaktext";
 import { takeInput } from "../../Screen/MainVoiceFuntion";
 import axios from 'axios';
+import SnakeGame from "../Game/SnakeGame";
+import PuzzleGame from "../Game/PuzzelGame";
 
 export default function Game({ userInput }) {
     const [showwindow, setShowWindow] = useState(false)
+    const [snakeGame, setSnakeGame] = useState(false);
+    const [showGame, setShowGame] = useState();
     const [gkQuiz, setGkQuize] = useState({ question: "", options: [], correctAns: "" });
     const { setListen, setSpeaking, setMicListen } = useContext(MyContext);
     const hasMounted = useRef(false);
@@ -24,20 +28,59 @@ export default function Game({ userInput }) {
             await gkquize();
         } else if (lowerCasedInput.includes("number guessing") || lowerCasedInput.includes("number")) {
             await numberGussing();
-        } else {
+        } else if (lowerCasedInput.includes("puzzle")) {
             setSpeaking(true);
-            await speakText("I have two games for you: a general knowledge quiz or a number guessing game. Which one would you to play?");
+            speakText("okay, We are in underprocess");
+            setSpeaking(false);
+            setShowGame(<PuzzleGame size={4} />)
+            setTimeout(() => {
+                setSnakeGame(true)
+            }, 5000)
+            return closeGame();
+        } else if (lowerCasedInput.includes("snake")) {
+            setSpeaking(true);
+            speakText("We are in underprocess");
+            setSpeaking(false);
+            setShowGame(<SnakeGame width={500} height={500} />)
+            setTimeout(() => {
+                setSnakeGame(true)
+            }, 5000)
+            return closeGame();
+        }
+        else {
+            setSpeaking(true);
+            await speakText("I have two games for you: a general knowledge quiz or a number guessing game. Which one would you play otherwise i create a another game for you. for example snake or puzzle game ");
             setSpeaking(false);
             setMicListen(true)
             let input = await takeInput();
             setMicListen(false)
             const lowerCasedInput = input.toLowerCase();
-
             if (lowerCasedInput.includes("gkquize") || lowerCasedInput.includes("gk quize") || lowerCasedInput.includes("general knowledge") || lowerCasedInput.includes("question answer")) {
                 await gkquize();
             } else if (lowerCasedInput.includes("number guessing") || lowerCasedInput.includes("number")) {
                 await numberGussing();
-            } else {
+            } else if (lowerCasedInput.includes("create") || lowerCasedInput.includes("game") || lowerCasedInput.includes("another")) {
+
+                if (lowerCasedInput.includes("puzzle") || lowerCasedInput.includes("puzzlegame")) {
+                    setSpeaking(true);
+                    await speakText("okay i create a puzzle game");
+                    speakText("We are in underprocess");
+                    setSpeaking(false);
+                    setShowGame(<PuzzleGame size={4} />)
+                } else {
+                    setSpeaking(true);
+                    await speakText("okay i create a everyone childhood favourite game snakegame");
+                    speakText("We are in underprocess");
+                    setSpeaking(false);
+                    setShowGame(<SnakeGame width={500} height={500} />)
+                }
+
+                setTimeout(() => {
+                    setSnakeGame(true)
+                }, 5000)
+                closeGame();
+            }
+            else {
                 setSpeaking(true);
                 await speakText("Sorry, I didn't catch that. Let's try again later. Thanks for stopping by!");
                 setSpeaking(false);
@@ -46,6 +89,17 @@ export default function Game({ userInput }) {
         }
     }
 
+    const closeGame = async () => {
+        setMicListen(true)
+        let input = await takeInput();
+        setMicListen(false)
+        if (input.toLowerCase().includes("stop") || input.toLowerCase().includes("close")) {
+            return setListen(true)
+        } else {
+            closeGame()
+        }
+
+    }
 
 
     async function gkquize() {
@@ -208,17 +262,20 @@ export default function Game({ userInput }) {
 
     return (
         <>
+            {snakeGame ? showGame : null}
+
             {gkQuiz && showwindow ? (
                 <div className="bg-gray-200 p-4 m-4 rounded">
                     <h3 className="text-lg font-bold mb-2">Que. {gkQuiz.question}</h3>
-                    <ul className=" list-none">
+                    <ul className="list-none">
                         {gkQuiz.options.map((option, index) => (
                             <li key={index} className="list-disc ml-4">{option}</li>
                         ))}
                     </ul>
-                    <p className=" text-base bg-green-400 bg-opacity-15 px-2 py-4">{gkQuiz.correctAns}</p>
+                    <p className="text-base bg-green-400 bg-opacity-15 px-2 py-4">{gkQuiz.correctAns}</p>
                 </div>
             ) : null}
         </>
-    )
+    );
+
 }

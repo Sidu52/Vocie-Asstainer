@@ -105,6 +105,14 @@ const MainScreen = () => {
             await speakText("okay, next time just say 'Hello Jarvis,' and I am always ready for you");
             setSpeaking(false);
             return await handlemainListen("");
+        } else if (input?.toLowerCase().includes("random") && input?.toLowerCase().includes("number")) {
+            setSpeaking(true);
+            await speakText("Okay, wait as I select a number between 1 to 10");
+            setSpeaking(false);
+            const randomNumber = Math.floor(Math.random() * 10) + 1;
+            setSpeaking(true);
+            await speakText("Please Move with number " + randomNumber);
+            setSpeaking(false);
         }
         else if (input || input != "") {
             setSearch(true)//For showing searching animation

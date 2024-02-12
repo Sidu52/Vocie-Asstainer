@@ -27,7 +27,8 @@ export default function PopupTour({ handleClosetour }) {
                             <span className='text-xl font-semibold max-sm:text-sm'>Features:</span>
                             <li>Retrieve Country, State, and City Information</li>
                             <li>Get City Weather Updates</li>
-                            <li>Play Games: General Knowledge Quiz and Number Guessing</li>
+                            <li>General Knowledge Quiz and Number Guessing</li>
+                            <li>Play Snake and Puzzel Game</li>
                             <li>Listen to Music: Video or Audio, and Control with voice command</li>
                             <li>Retrieve Date, Time, Weekday, Month, Year</li>
                             <li>Try Your Luck: Toss a Coin or Roll a Dice</li>

@@ -352,7 +352,7 @@ export default function DummyScreen({ name, userInput }) {
 
     async function getLocationName(latitude, longitude) {
         try {
-            const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json?key=${""}&q=${latitude}+${longitude}&pretty=1`);
+            const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json?key=${"80f15158956343a5b8fc36350e8ecae4"}&q=${latitude}+${longitude}&pretty=1`);
 
             const results = response.data.results;
 
