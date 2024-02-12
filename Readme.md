@@ -4,63 +4,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jarvis Voice Assistant</title>
-  <style>
-    
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 20px;
-      padding: 20px;
-    }
-
-    h1 {
-      color: #333;
-    }
-
-    p {
-      color: #555;
-    }
-
-    img {
-      max-width: 100%;
-      height: auto;
-    }
-
-    .features {
-      font-size: 1.2em;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    li {
-      margin-bottom: 5px;
-    }
-
-    .usage {
-      font-size: 1em;
-      margin-top: 20px;
-    }
-
-    .how-to-run {
-      font-size: 1.2em;
-      margin-top: 20px;
-    }
-
-    .contribution {
-      font-size: 1.2em;
-      margin-top: 20px;
-    }
-
-    .license {
-      font-size: 1.2em;
-      margin-top: 20px;
-    }
-  </style>
 </head>
 
 <body>
